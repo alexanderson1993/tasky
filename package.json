@@ -8,7 +8,7 @@
   "targets": {
     "app": {
       "engines": {
-        "browsers": "> 0.25%"
+        "browsers": "last 2 Chrome versions"
       }
     }
   },
