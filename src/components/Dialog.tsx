@@ -6,7 +6,6 @@ import {
   AlertDialogOverlay,
   AlertDialogContent,
   AlertDialogHeader,
-  AlertDialogCloseButton,
   AlertDialogBody,
   AlertDialogFooter,
   Button,
@@ -47,12 +46,26 @@ const Dialog: React.FC = ({ children }) => {
       setBody(body || "");
       setType(type);
       setInput(defaultValue || "");
+
       return new Promise<boolean | string>((resolve) => {
         resolveRef.current = resolve;
       });
     },
-    []
+    [isOpen, onOpen]
   );
+
+  const [inputEl, setInputEl] = React.useState(null);
+
+  const inputRef = React.useCallback((node) => {
+    if (node !== null) {
+      setInputEl(node);
+    }
+  }, []);
+  React.useEffect(() => {
+    if (isOpen && type === "prompt" && inputEl) {
+      inputEl.setSelectionRange(0, inputEl.value.length);
+    }
+  }, [inputEl, isOpen, type]);
 
   React.useEffect(() => {
     function handleReturn(e) {
@@ -71,7 +84,7 @@ const Dialog: React.FC = ({ children }) => {
       document.addEventListener("keydown", handleReturn);
       return () => document.removeEventListener("keydown", handleReturn);
     }
-  }, [isOpen, input, type]);
+  }, [isOpen, input, type, onClose]);
 
   return (
     <DialogContext.Provider value={openConfirm}>
@@ -96,7 +109,7 @@ const Dialog: React.FC = ({ children }) => {
               <AlertDialogBody>
                 {type === "prompt" ? (
                   <Input
-                    autoFocus
+                    ref={inputRef}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                   />

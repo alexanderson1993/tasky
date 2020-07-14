@@ -26,7 +26,7 @@ const Sidebar: React.FC = () => {
   const [selected, setSelected] = useRecoilState(selectedTask);
   const [taskPage, setTaskPage] = React.useState<
     null | "goals" | "unblocked" | "project"
-  >(null);
+  >("project");
   return (
     <Box
       display="flex"

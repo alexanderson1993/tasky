@@ -33,9 +33,8 @@ ReactDOM.render(
   rootElement
 );
 
-// TODO: Add project support
-// TODO: Add import and export
-// TODO: Improve whitespace and scrolling on sidebar
+// TODO: Add training - reactour or something
 // TODO: Mobile support
 // TODO: Make it a PWA
 // TODO: Link it to Firebase?
+// TODO: Make sure the canvas automatically focuses on the center of the nodes (not necessarily the center of the canvas)

@@ -4,8 +4,9 @@ import { taskPositionFamily } from "../atoms/taskPosition";
 import { flowFamily, flowList, selectedFlow } from "../atoms/flow";
 import debounce from "lodash.debounce";
 import { dependencyList } from "../atoms/dependencies";
+import { projectName } from "../atoms/project";
 
-const processSnapshot = debounce(async function (snapshot) {
+export const generateData = async function (snapshot) {
   const taskIds = await snapshot.getPromise(taskList);
 
   // Flows
@@ -33,15 +34,21 @@ const processSnapshot = debounce(async function (snapshot) {
   for (let id of taskIds) {
     tasks.push(await snapshot.getPromise(taskFamily(id)));
   }
-  localStorage.setItem(
-    "tasky_storage",
-    JSON.stringify({
-      tasks,
-      flows,
-      dependencies,
-      selectedFlow: selectedFlowValue,
-    })
-  );
+  // Project name
+  const projectNameValue = await snapshot.getPromise(projectName);
+
+  return {
+    projectName: projectNameValue,
+    tasks,
+    flows,
+    dependencies,
+    selectedFlow: selectedFlowValue,
+  };
+};
+const processSnapshot = debounce(async function (snapshot) {
+  const data = await generateData(snapshot);
+
+  localStorage.setItem("tasky_storage", JSON.stringify(data));
 }, 1000);
 
 export function usePersistStorage() {
@@ -50,16 +57,15 @@ export function usePersistStorage() {
   });
 }
 
-export function initState({ set }: MutableSnapshot) {
-  const data = localStorage.getItem("tasky_storage");
-  if (!data) return;
+export function setData(data, set) {
   const {
+    projectName: projectNameValue,
     tasks,
     flows,
     dependencies,
     selectedFlow: selectedFlowValue,
-  } = JSON.parse(data);
-
+  } = data;
+  set(projectName, projectNameValue);
   set(selectedFlow, selectedFlowValue);
 
   tasks.forEach((t) => {
@@ -87,4 +93,11 @@ export function initState({ set }: MutableSnapshot) {
   );
 
   set(dependencyList, dependencies);
+}
+export function initState({ set }: MutableSnapshot) {
+  const data = localStorage.getItem("tasky_storage");
+  if (!data) return;
+  const outputData = JSON.parse(data);
+
+  setData(outputData, set);
 }
