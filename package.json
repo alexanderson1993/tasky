@@ -3,11 +3,18 @@
   "version": "1.0.0",
   "description": "",
   "keywords": [],
-  "main": "src/index.js",
   "license": "MIT",
+  "app": "dist/browser/index.html",
+  "targets": {
+    "app": {
+      "engines": {
+        "browsers": "> 0.25%"
+      }
+    }
+  },
   "scripts": {
     "start": "parcel src/index.html",
-    "build": "react-scripts build"
+    "build": "parcel build src/index.html"
   },
   "dependencies": {
     "@chakra-ui/core": "0.8.0",
