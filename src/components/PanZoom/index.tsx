@@ -58,6 +58,8 @@ type Props = {
   boundaryRatioHorizontal: number;
   enableBoundingBox?: boolean;
   style?: Object;
+  initialX?: number;
+  initialY?: number;
 
   onPanStart?: (any) => void;
   onPan?: (any) => void;
@@ -97,6 +99,8 @@ class PanZoom extends React.Component<Props, State> {
     disableDoubleClickZoom: false,
     disableScrollZoom: false,
     preventPan: () => false,
+    initialX: 0,
+    initialY: 0,
   };
 
   container = React.createRef<HTMLDivElement>();
@@ -124,8 +128,8 @@ class PanZoom extends React.Component<Props, State> {
   intermediateTransformMatrixString = `matrix(1, 0, 0, 1, 0, 0)`;
 
   state: State = {
-    x: 0,
-    y: 0,
+    x: this.props.initialX,
+    y: this.props.initialY,
     scale: 1,
     angle: 0,
   };
@@ -145,6 +149,47 @@ class PanZoom extends React.Component<Props, State> {
     if (autoCenter) {
       this.autoCenter(autoCenterZoomLevel, false);
     }
+    if (this.props.onStateChange) {
+      this.props.onStateChange({
+        x: this.state.x,
+        y: this.state.y,
+        scale: this.state.scale,
+        angle: this.state.angle,
+      });
+    }
+
+    const {
+      a,
+      b,
+      c,
+      d,
+      x: transformX,
+      y: transformY,
+    } = this.getTransformMatrix(
+      this.state.x,
+      this.state.y,
+      this.state.scale,
+      this.state.angle
+    );
+    const { boundX, boundY } = this.getBoundCoordinates(
+      { x: transformX, y: transformY },
+      {
+        angle: this.state.angle,
+        scale: this.state.scale,
+        offsetX: this.state.x,
+        offsetY: this.state.y,
+      }
+    );
+    this.transformMatrixString = getTransformMatrixString({
+      a,
+      b,
+      c,
+      d,
+      x: boundX,
+      y: boundY,
+    });
+
+    this.frameAnimation = window.requestAnimationFrame(this.applyTransform);
   }
 
   componentDidUpdate(prevProps: Props, prevState: State): void {
@@ -289,7 +334,6 @@ class PanZoom extends React.Component<Props, State> {
       disableScrollZoom,
       disabled,
       zoomSpeed,
-      realPinch,
       noStateUpdate,
     } = this.props;
     if (disableScrollZoom || disabled) {

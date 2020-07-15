@@ -8,6 +8,7 @@ import {
   flowTasks,
   extraDependentsShown,
   extraDependenciesShown,
+  flowDimensions,
 } from "../atoms/node";
 import Node from "./Node";
 import { PanStateI } from "../types";
@@ -113,6 +114,7 @@ const Canvas: React.FC = () => {
   const nodes = useRecoilValue(flowTasks);
   const dependencies = useRecoilValue(flowDependencies);
   const setDependencyList = useSetRecoilState(dependencyList);
+  const dims = useRecoilValue(flowDimensions);
   const [ref, dimensions] = useMeasure();
   const [selectedTaskValue, setSelected] = useRecoilState(selectedTask);
   const toast = useToast();
@@ -285,6 +287,9 @@ const Canvas: React.FC = () => {
             </g>
           </svg>
           <PanZoom
+            key={selected}
+            initialX={dimensions.width / 2 + dims.center.x * -1}
+            initialY={dimensions.height / 2 + dims.center.y * -1}
             onMouseDown={() => (panned.current = false)}
             style={{ height: "100%", width: "100%", outline: "none" }}
             maxZoom={2}

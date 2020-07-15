@@ -19,6 +19,34 @@ export const flowTasks = selector<string[]>({
   },
 });
 
+export const flowDimensions = selector<{
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+  center: { x: number; y: number };
+}>({
+  key: "FlowDimensions",
+  get: ({ get }) => {
+    const taskList = get(flowTasks);
+    const allTasks = taskList.map((t) => get(node(t)));
+    const { left, right, top, bottom } = allTasks.reduce(
+      (prev, next) => {
+        if (next.x < prev.left) prev.left = next.x;
+        if (next.x > prev.right) prev.right = next.x;
+        if (next.y < prev.top) prev.top = next.y;
+        if (next.y > prev.bottom) prev.bottom = next.y;
+        return prev;
+      },
+      { left: Infinity, right: -Infinity, top: Infinity, bottom: -Infinity }
+    );
+    const center = {
+      x: (right - left) / 2 + left,
+      y: (bottom - top) / 2 + top,
+    };
+    return { left, right, top, bottom, center };
+  },
+});
 interface NodeI {
   id: string;
   title: string;

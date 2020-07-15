@@ -5,6 +5,7 @@ import { useRecoilValue, useRecoilState, RecoilValueReadOnly } from "recoil";
 import { selectedTask, taskGoals, taskUnblocked } from "../../atoms/task";
 import SelectedTask, { SidebarDep } from "./SelectedTask";
 import ProjectDetails from "./ProjectDetails";
+import { selectedFlow } from "../../atoms/flow";
 
 const TaskList: React.FC<{
   title: string;
@@ -24,9 +25,10 @@ const TaskList: React.FC<{
 
 const Sidebar: React.FC = () => {
   const [selected, setSelected] = useRecoilState(selectedTask);
+  const selectedFlowValue = useRecoilValue(selectedFlow);
   const [taskPage, setTaskPage] = React.useState<
     null | "goals" | "unblocked" | "project"
-  >("project");
+  >(selectedFlowValue ? null : "project");
   return (
     <Box
       display="flex"
