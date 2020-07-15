@@ -9,7 +9,7 @@ import {
   Flex,
 } from "@chakra-ui/core";
 import { flowList, selectedFlow, flowSelector } from "../../atoms/flow";
-import { useRecoilState, useSetRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useSetRecoilState } from "recoil";
 import { Draggable } from "react-beautiful-dnd";
 
 const FlowItem: React.FC<{ value: string; index: number }> = ({
