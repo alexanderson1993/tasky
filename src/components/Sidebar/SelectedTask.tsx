@@ -8,6 +8,8 @@ import {
   Textarea,
   Grid,
   PseudoBox,
+  IconButton,
+  Box,
 } from "@chakra-ui/core";
 import { useConfirm, usePrompt } from "../Dialog";
 import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
@@ -175,7 +177,8 @@ export const SidebarDep: React.FC<{ taskId: string; onClick?: () => void }> = ({
   taskId,
   onClick,
 }) => {
-  const setSelected = useSetRecoilState(selectedTask);
+  const [selectedTaskValue, setSelected] = useRecoilState(selectedTask);
+  const setDependencies = useSetRecoilState(dependencyList);
   const task = useRecoilValue(taskFamily(taskId));
   return (
     <PseudoBox
@@ -183,6 +186,7 @@ export const SidebarDep: React.FC<{ taskId: string; onClick?: () => void }> = ({
       pl={2}
       pr={2}
       bg={task.status === "in-progress" ? "blue.500" : "blue.800"}
+      display="flex"
       textDecoration={task.status === "completed" ? "line-through" : ""}
       borderColor="blue.300"
       borderWidth={1}
@@ -196,7 +200,27 @@ export const SidebarDep: React.FC<{ taskId: string; onClick?: () => void }> = ({
         setSelected(task.id);
       }}
     >
-      {task.title}
+      <Box flex={1}>{task.title}</Box>
+      <IconButton
+        aria-label="Remove Connection"
+        size="xs"
+        icon="delete"
+        variant="ghost"
+        variantColor="red"
+        onClick={(e) => {
+          e.stopPropagation();
+          setDependencies((d) =>
+            d.filter(({ left, right }) => {
+              if (
+                (left === task.id && right === selectedTaskValue) ||
+                (right === task.id && left === selectedTaskValue)
+              )
+                return false;
+              return true;
+            })
+          );
+        }}
+      />
     </PseudoBox>
   );
 };

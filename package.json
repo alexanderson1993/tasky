@@ -1,8 +1,15 @@
 {
   "name": "tasky",
   "version": "1.0.0",
-  "description": "",
-  "keywords": [],
+  "description": "Simple flow diagram task management",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alexanderson1993/tasky.git"
+  },
+  "author": "Alex Anderson <hey@ralexanderson.com>",
+  "bugs": {
+    "url": "https://github.com/alexanderson1993/tasky/issues"
+  },
   "license": "MIT",
   "app": "dist/browser/index.html",
   "targets": {
@@ -34,7 +41,6 @@
     "react": "^16.13.1",
     "react-beautiful-dnd": "13.0.0",
     "react-dom": "^16.13.1",
-    "react-easy-panzoom": "0.4.4",
     "react-use-gesture": "^7.0.15",
     "recoil": "0.0.10",
     "uniqid": "5.2.0"
