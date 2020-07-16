@@ -308,8 +308,8 @@ const Canvas: React.FC = () => {
           </svg>
           <PanZoom
             key={selected}
-            initialX={dimensions.width / 2 + dims.center.x * -1 || 0}
-            initialY={dimensions.height / 2 + dims.center.y * -1 || 0}
+            initialX={dimensions.width / 2 + dims.center.x * -1 - 150 || 0}
+            initialY={dimensions.height / 2 + dims.center.y * -1 - 100 || 0}
             onMouseDown={() => (panned.current = false)}
             style={{ height: "100%", width: "100%", outline: "none" }}
             maxZoom={2}

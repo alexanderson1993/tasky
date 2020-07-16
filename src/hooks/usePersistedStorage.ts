@@ -66,7 +66,7 @@ export function setData(data, set) {
     selectedFlow: selectedFlowValue,
   } = data;
   set(projectName, projectNameValue);
-  set(selectedFlow, selectedFlowValue);
+  set(selectedFlow, selectedFlowValue || flows?.[0]?.id || null);
 
   tasks.forEach((t) => {
     set(taskFamily(t.id), t);
