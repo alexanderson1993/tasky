@@ -45,7 +45,7 @@ const Sidebar: React.FC = () => {
       p={2}
     >
       {taskPage === "project" ? (
-        <ProjectDetails />
+        <ProjectDetails setTaskPage={setTaskPage} />
       ) : taskPage === "goals" ? (
         <TaskList
           title="Goals"

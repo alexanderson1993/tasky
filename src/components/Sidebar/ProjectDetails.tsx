@@ -1,13 +1,18 @@
 import { Button, Heading, Stack, useToast } from "@chakra-ui/core";
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, Dispatch } from "react";
 import { useRecoilCallback, useRecoilState } from "recoil";
 import { projectName } from "../../atoms/project";
 import { generateData, setData } from "../../hooks/usePersistedStorage";
-import { usePrompt } from "../Dialog";
+import { useConfirm, usePrompt } from "../Dialog";
 
-const ProjectDetails: React.FC = () => {
+const ProjectDetails: React.FC<{
+  setTaskPage: Dispatch<
+    React.SetStateAction<null | "goals" | "unblocked" | "project">
+  >;
+}> = ({ setTaskPage }) => {
   const [projectNameValue, setProjectName] = useRecoilState(projectName);
   const prompt = usePrompt();
+  const confirm = useConfirm();
   const toast = useToast();
 
   const exportData = useRecoilCallback(({ snapshot }) => async () => {
@@ -53,6 +58,19 @@ const ProjectDetails: React.FC = () => {
       reader.readAsText(file);
     }
   );
+  const clearData = useRecoilCallback(({ set }) => async () => {
+    setData(
+      {
+        tasks: [],
+        flows: [],
+        dependencies: [],
+        selectedFlow: null,
+      },
+      set
+    );
+    setTaskPage(null);
+    localStorage.removeItem("tasky_storage");
+  });
   return (
     <div>
       <Heading size="lg">Project</Heading>
@@ -93,6 +111,7 @@ const ProjectDetails: React.FC = () => {
             as="div"
             size="sm"
             width="100%"
+            mb={2}
             justifyContent="start"
             variantColor="blue"
             leftIcon="triangle-up"
@@ -101,6 +120,26 @@ const ProjectDetails: React.FC = () => {
             Import
           </Button>
         </label>
+        <Button
+          size="sm"
+          width="100%"
+          justifyContent="start"
+          variantColor="red"
+          leftIcon="delete"
+          onClick={async () => {
+            if (
+              await confirm({
+                header: "Are you sure you want to clear this Project?",
+                body:
+                  "This will clear the project from your browser's storage. Make sure you export before doing this.",
+              })
+            ) {
+              clearData();
+            }
+          }}
+        >
+          Clear
+        </Button>
       </Stack>
     </div>
   );

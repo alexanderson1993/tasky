@@ -8,6 +8,7 @@ import { ThemeProvider, CSSReset, theme } from "@chakra-ui/core";
 import App from "./App";
 import Dialog from "./components/Dialog";
 import { initState } from "./hooks/usePersistedStorage";
+import { css, Global } from "@emotion/core";
 
 const customTheme = {
   ...theme,
@@ -25,6 +26,17 @@ ReactDOM.render(
   <React.StrictMode>
     <RecoilRoot initializeState={initState}>
       <ThemeProvider theme={customTheme}>
+        <Global
+          styles={css`
+            html,
+            body {
+              overflow: hidden;
+              position: fixed;
+              width: 100vw;
+              height: 100vh;
+            }
+          `}
+        ></Global>
         <CSSReset />
         <Dialog>
           <App />

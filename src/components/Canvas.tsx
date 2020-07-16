@@ -269,7 +269,7 @@ const Canvas: React.FC = () => {
       overflow="hidden"
       onClick={panZoomClick}
     >
-      {nodes.length === 0 && (
+      {selected && nodes.length === 0 && (
         <Flex
           position="absolute"
           width="100%"
