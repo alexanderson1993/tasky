@@ -1,6 +1,6 @@
 import { atom, selectorFamily, selector } from "recoil";
 import { taskPositionFamily } from "./taskPosition";
-import { selectedFlow } from "./flow";
+import { selectedFlow, FlowI, flowList, flowFamily } from "./flow";
 export const dependencyList = atom<{ left: string; right: string }[]>({
   key: "DependencyList",
   default: [],
@@ -61,6 +61,16 @@ export const taskDependents = selectorFamily<string[], string>({
       .filter((d) => d.right === taskId)
       .map((d) => d.left);
     return taskDeps;
+  },
+});
+
+export const taskFlowsList = selectorFamily<FlowI[], string>({
+  key: "TaskFlowsList",
+  get: (taskId) => ({ get }) => {
+    const flows = get(flowList).map((f) => get(flowFamily(f)));
+    return flows.filter(
+      (f) => get(taskPositionFamily({ task: taskId, flow: f.id })).visible
+    );
   },
 });
 

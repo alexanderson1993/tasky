@@ -40,6 +40,19 @@ const Node: React.FC<{
     }));
   });
   const eventHandlers = bind() as any;
+  function boxColor() {
+    if (!nodeInfo.isUnblocked) return "gray.500";
+    if (nodeInfo.isSelected) return "teal.100";
+    return "blue.100";
+  }
+  function boxBg() {
+    if (nodeInfo.isSelected) {
+      if (nodeInfo.status === "in-progress") return "teal.500";
+      return "teal.800";
+    }
+    if (nodeInfo.status === "in-progress") return "blue.500";
+    return "blue.900";
+  }
   return (
     <Box
       userSelect="none"
@@ -56,21 +69,9 @@ const Node: React.FC<{
         p={1}
         pl={2}
         pr={2}
-        color={
-          !nodeInfo.isUnblocked
-            ? "gray.500"
-            : nodeInfo.isSelected
-            ? "teal.100"
-            : "blue.100"
-        }
+        color={boxColor()}
         fontSize={!nodeInfo.hasDependents ? "2xl" : ""}
-        bg={
-          nodeInfo.isSelected
-            ? "teal.800"
-            : nodeInfo.status === "in-progress"
-            ? "blue.500"
-            : "blue.900"
-        }
+        bg={boxBg()}
         borderColor={nodeInfo.isSelected ? "teal.300" : "blue.400"}
         borderWidth={1}
         cursor="grab"

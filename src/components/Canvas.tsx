@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, useToast } from "@chakra-ui/core";
+import { Box, Flex, Heading, useToast } from "@chakra-ui/core";
 import PanZoom from "./PanZoom";
 import TaskInput from "./TaskInput";
 import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
@@ -25,6 +25,7 @@ import { selectedTask } from "../atoms/task";
 import { taskInputAtom } from "../atoms/taskInput";
 import ExtraDependencies from "./Extras/Dependencies";
 import ExtraDependents from "./Extras/Dependents";
+import UnassignedTasks from "./UnassignedTasks";
 
 const PanZoomWrapper = styled(Box)`
   & > div > div {
@@ -124,6 +125,7 @@ const Canvas: React.FC = () => {
 
   const [taskInput, setTaskInput] = useRecoilState(taskInputAtom);
   const closeNode = React.useCallback(() => {
+    lineDroppedIntoNode.current = false;
     setLineDrag(null);
     setTaskInput(null);
   }, [setTaskInput]);
@@ -208,36 +210,42 @@ const Canvas: React.FC = () => {
 
   const panZoomClick = React.useCallback(
     (e) => {
+      function openTaskInput() {
+        const { clientX, clientY } = e;
+        const { top, left } = dimensions;
+
+        if (!panned.current && !lineDrag) {
+          lineDroppedIntoNode.current = true;
+          const pageX = clientX - left;
+          const pageY = clientY - top;
+          const canvasX = (pageX - panState.current.x) / panState.current.scale;
+          const canvasY = (pageY - panState.current.y) / panState.current.scale;
+          setTaskInput({ x: canvasX, y: canvasY, pageX, pageY });
+        }
+      }
       setExtraDependencies(null);
       setExtraDependents(null);
       if (!selected) return;
-      if (selectedTaskValue) {
-        setSelected(null);
-        return;
-      }
       if (lineDrag && taskInput && lineDroppedIntoNode.current) {
         setLineDrag(null);
         setTaskInput(null);
+        lineDroppedIntoNode.current = false;
         return;
       } else if (taskInput && lineDroppedIntoNode.current) {
         lineDroppedIntoNode.current = false;
+        setSelected(null);
         return setTaskInput(null);
       } else if (lineDroppedIntoNode.current) {
         lineDroppedIntoNode.current = false;
         return;
       }
-      setSelected(null);
-      const { clientX, clientY } = e;
-      const { top, left } = dimensions;
-
-      if (!panned.current && !lineDrag) {
-        lineDroppedIntoNode.current = true;
-        const pageX = clientX - left;
-        const pageY = clientY - top;
-        const canvasX = (pageX - panState.current.x) / panState.current.scale;
-        const canvasY = (pageY - panState.current.y) / panState.current.scale;
-        setTaskInput({ x: canvasX, y: canvasY, pageX, pageY });
+      if (selectedTaskValue) {
+        setSelected(null);
+        openTaskInput();
+        return;
       }
+
+      openTaskInput();
     },
     [
       setExtraDependencies,
@@ -251,7 +259,7 @@ const Canvas: React.FC = () => {
       setTaskInput,
     ]
   );
-
+  if (selected === "Unassigned") return <UnassignedTasks />;
   return (
     <PanZoomWrapper
       ref={ref}
@@ -261,7 +269,19 @@ const Canvas: React.FC = () => {
       overflow="hidden"
       onClick={panZoomClick}
     >
-      {selected && (
+      {nodes.length === 0 && (
+        <Flex
+          position="absolute"
+          width="100%"
+          height="100%"
+          justifyContent="center"
+          alignItems="center"
+          pointerEvents="none"
+        >
+          <Heading color="gray.500">Click anywhere to add tasks</Heading>
+        </Flex>
+      )}
+      {dimensions.width && selected && (
         <>
           <svg
             width="100%"
@@ -288,8 +308,8 @@ const Canvas: React.FC = () => {
           </svg>
           <PanZoom
             key={selected}
-            initialX={dimensions.width / 2 + dims.center.x * -1}
-            initialY={dimensions.height / 2 + dims.center.y * -1}
+            initialX={dimensions.width / 2 + dims.center.x * -1 || 0}
+            initialY={dimensions.height / 2 + dims.center.y * -1 || 0}
             onMouseDown={() => (panned.current = false)}
             style={{ height: "100%", width: "100%", outline: "none" }}
             maxZoom={2}

@@ -1,6 +1,8 @@
 import { atomFamily, atom, selectorFamily } from "recoil";
+import uniqid from "uniqid";
 
-interface FlowI {
+const defaultFlow = uniqid();
+export interface FlowI {
   id: string;
   title: string;
 }
@@ -10,11 +12,11 @@ export const flowFamily = atomFamily<FlowI, string>({
 });
 export const flowList = atom<string[]>({
   key: "FlowList",
-  default: [],
+  default: [defaultFlow],
 });
 export const selectedFlow = atom<string | null>({
   key: "SelectedFlow",
-  default: null,
+  default: defaultFlow,
 });
 export const flowSelector = selectorFamily<
   FlowI & { isSelected: boolean },

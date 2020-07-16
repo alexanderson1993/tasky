@@ -1,4 +1,6 @@
-import { atomFamily } from "recoil";
+import { atomFamily, selector } from "recoil";
+import { flowList } from "./flow";
+import { taskList } from "./task";
 
 interface TaskPositionI {
   task: string;
@@ -19,4 +21,20 @@ export const taskPositionFamily = atomFamily<
     y: 0,
     visible: false,
   }),
+});
+
+export const unassignedTasks = selector<string[]>({
+  key: "UnassignedTasks",
+  get: ({ get }) => {
+    const tasks = get(taskList);
+    const flows = get(flowList);
+    const filteredTasks = tasks.filter((t) => {
+      if (
+        flows.find((f) => get(taskPositionFamily({ task: t, flow: f })).visible)
+      )
+        return false;
+      return true;
+    });
+    return filteredTasks;
+  },
 });

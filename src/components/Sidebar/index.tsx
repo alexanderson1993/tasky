@@ -7,17 +7,17 @@ import SelectedTask, { SidebarDep } from "./SelectedTask";
 import ProjectDetails from "./ProjectDetails";
 import { selectedFlow } from "../../atoms/flow";
 
-const TaskList: React.FC<{
-  title: string;
+export const TaskList: React.FC<{
+  title?: string;
   taskAtom: RecoilValueReadOnly<string[]>;
-  onClick: () => void;
+  onClick?: () => void;
 }> = ({ title, taskAtom, onClick }) => {
   const tasks = useRecoilValue(taskAtom);
   return (
     <Stack>
       <Heading size="lg">{title}</Heading>
       {tasks.map((t) => (
-        <SidebarDep key={t} taskId={t} onClick={onClick} />
+        <SidebarDep key={t} taskId={t} onClick={onClick} noDelete />
       ))}
     </Stack>
   );
@@ -29,6 +29,7 @@ const Sidebar: React.FC = () => {
   const [taskPage, setTaskPage] = React.useState<
     null | "goals" | "unblocked" | "project"
   >(selectedFlowValue ? null : "project");
+
   return (
     <Box
       display="flex"

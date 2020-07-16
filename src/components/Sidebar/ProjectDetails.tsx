@@ -56,29 +56,32 @@ const ProjectDetails: React.FC = () => {
   return (
     <div>
       <Heading size="lg">Project</Heading>
-      <Heading
-        size="md"
-        cursor="pointer"
-        title="Rename"
-        onClick={async () => {
-          const title = await prompt({
-            header: "Rename Project",
-            body: "What is the new name for the project?",
-            defaultValue: projectNameValue,
-          });
-          if (title && typeof title === "string") {
-            setProjectName(title);
-          }
-        }}
-      >
-        {projectNameValue || "New Project"}
-      </Heading>
+      <Heading size="md">{projectNameValue || "New Project"}</Heading>
       <Stack mt={2}>
         <Button
           size="sm"
           width="100%"
           justifyContent="start"
-          variantColor="teal"
+          variantColor="blue"
+          leftIcon="edit"
+          onClick={async () => {
+            const title = await prompt({
+              header: "Rename Project",
+              body: "What is the new name for the project?",
+              defaultValue: projectNameValue,
+            });
+            if (title && typeof title === "string") {
+              setProjectName(title);
+            }
+          }}
+        >
+          Rename
+        </Button>
+        <Button
+          size="sm"
+          width="100%"
+          justifyContent="start"
+          variantColor="blue"
           leftIcon="triangle-down"
           onClick={exportData}
         >
@@ -91,7 +94,7 @@ const ProjectDetails: React.FC = () => {
             size="sm"
             width="100%"
             justifyContent="start"
-            variantColor="teal"
+            variantColor="blue"
             leftIcon="triangle-up"
             onClick={() => {}}
           >

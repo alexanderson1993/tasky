@@ -22,6 +22,7 @@ export const taskValueList = selector<TaskI[]>({
     return taskIds.map((t) => get(taskFamily(t)));
   },
 });
+
 export const selectedTask = atom<string>({
   key: "SelectedTask",
   default: null,

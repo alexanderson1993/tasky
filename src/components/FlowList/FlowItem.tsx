@@ -16,11 +16,12 @@ const FlowItem: React.FC<{ value: string; index: number }> = ({
   value,
   index,
 }) => {
-  const [flowItem, setFlowItem] = useRecoilState(flowSelector(value));
+  let [flowItem, setFlowItem] = useRecoilState(flowSelector(value));
   const select = useSetRecoilState(selectedFlow);
 
   const setFlowList = useSetRecoilState(flowList);
-
+  const isUnassigned = value === "Unassigned";
+  if (isUnassigned) flowItem = { ...flowItem, title: "Unassigned" };
   return (
     <Draggable draggableId={value} index={index}>
       {(provided) => (
@@ -45,7 +46,10 @@ const FlowItem: React.FC<{ value: string; index: number }> = ({
           _active={{ bg: "blue.500" }}
         >
           <Flex>
-            <span {...provided.dragHandleProps}>
+            <span
+              {...provided.dragHandleProps}
+              style={{ visibility: isUnassigned ? "hidden" : "" }}
+            >
               <Icon
                 name="drag-handle"
                 size="12px"
@@ -65,6 +69,7 @@ const FlowItem: React.FC<{ value: string; index: number }> = ({
                   <EditableInput width="200px" flex={1} />
                   <EditablePreview flex={1} cursor="pointer" />
                   <IconButton
+                    display={isUnassigned ? "none" : ""}
                     aria-label="Edit Name"
                     size="xs"
                     icon="edit"
@@ -76,6 +81,7 @@ const FlowItem: React.FC<{ value: string; index: number }> = ({
               )}
             </Editable>
             <IconButton
+              display={isUnassigned ? "none" : ""}
               aria-label="Remove Flow"
               size="xs"
               icon="delete"

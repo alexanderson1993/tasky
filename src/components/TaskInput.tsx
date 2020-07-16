@@ -36,6 +36,50 @@ const createItem = {
   title: 'Create task "$1"',
 } as TaskI;
 
+export function useHandleCreateTask({
+  lineDrag,
+  canvasPosition,
+  close,
+}: {
+  lineDrag?: {
+    x: number;
+    y: number;
+    nodeId: string;
+    side: "left" | "right";
+  };
+  canvasPosition?: { x: number; y: number };
+  close?: () => void;
+}) {
+  const setTaskList = useSetRecoilState(taskList);
+
+  const handleCreateTask = useRecoilCallback(
+    ({ snapshot, set }) => async (value: string) => {
+      const id = uniqid();
+      const flow = await snapshot.getPromise(selectedFlow);
+      setTaskList((list) => list.concat(id));
+      set(selectedTask, id);
+      set(taskFamily(id), (state) => ({ ...state, title: value }));
+      if (canvasPosition) {
+        set(taskPositionFamily({ task: id, flow }), (state) => ({
+          ...state,
+          ...canvasPosition,
+          visible: true,
+        }));
+      }
+      if (lineDrag) {
+        set(dependencyList, (list) =>
+          list.concat({
+            right: lineDrag.side === "right" ? lineDrag.nodeId : id,
+            left: lineDrag.side === "right" ? id : lineDrag.nodeId,
+          })
+        );
+      }
+      close?.();
+    },
+    []
+  );
+  return handleCreateTask;
+}
 const TaskInput: React.FC<{
   x: number;
   y: number;
@@ -48,11 +92,16 @@ const TaskInput: React.FC<{
   canvasPosition: { x: number; y: number };
   close: () => void;
 }> = ({ x, y, lineDrag, canvasPosition, close }) => {
-  const setTaskList = useSetRecoilState(taskList);
   const taskValues = useRecoilValue(taskValueList);
   const [inputItems, setInputItems] = React.useState<TaskI[]>([]);
   const inputValueRef = React.useRef<string>("");
   const inputIndexRef = React.useRef<number>(-1);
+  const handleCreateTask = useHandleCreateTask({
+    canvasPosition,
+    close,
+    lineDrag,
+  });
+
   const {
     isOpen,
     selectedItem,
@@ -99,30 +148,6 @@ const TaskInput: React.FC<{
       }));
     }
   );
-  const handleCreateTask = useRecoilCallback(
-    ({ snapshot, set }) => async (value: string) => {
-      const id = uniqid();
-      const flow = await snapshot.getPromise(selectedFlow);
-      setTaskList((list) => list.concat(id));
-      set(selectedTask, id);
-      set(taskFamily(id), (state) => ({ ...state, title: value }));
-      set(taskPositionFamily({ task: id, flow }), (state) => ({
-        ...state,
-        ...canvasPosition,
-        visible: true,
-      }));
-      if (lineDrag) {
-        set(dependencyList, (list) =>
-          list.concat({
-            right: lineDrag.side === "right" ? lineDrag.nodeId : id,
-            left: lineDrag.side === "right" ? id : lineDrag.nodeId,
-          })
-        );
-      }
-      close();
-    },
-    []
-  );
 
   // const inputRef = React.useRef<HTMLInputElement>();
 
@@ -139,7 +164,6 @@ const TaskInput: React.FC<{
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, [close]);
-
   return (
     <Box
       position="fixed"

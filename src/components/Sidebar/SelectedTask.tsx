@@ -20,18 +20,19 @@ import {
   taskFamily,
 } from "../../atoms/task";
 import { taskPositionFamily } from "../../atoms/taskPosition";
-import { selectedFlow } from "../../atoms/flow";
+import { FlowI, selectedFlow } from "../../atoms/flow";
 import {
   taskDependencies,
   taskDependents,
   dependencyList,
+  taskFlowsList,
 } from "../../atoms/dependencies";
 
 const SelectedTask: React.FC = () => {
   const [task, setTask] = useRecoilState(selectedTaskData);
   const setTaskList = useSetRecoilState(taskList);
   const selected = useRecoilValue(selectedFlow);
-  const setTaskPosition = useSetRecoilState(
+  const [taskPositionValue, setTaskPosition] = useRecoilState(
     taskPositionFamily({ task: task.id, flow: selected })
   );
   const setDependencyList = useSetRecoilState(dependencyList);
@@ -39,6 +40,7 @@ const SelectedTask: React.FC = () => {
 
   const dependencies = useRecoilValue(taskDependencies(task.id));
   const dependents = useRecoilValue(taskDependents(task.id));
+  const flows = useRecoilValue(taskFlowsList(task.id));
 
   const prompt = usePrompt();
   const confirm = useConfirm();
@@ -128,20 +130,21 @@ const SelectedTask: React.FC = () => {
         >
           Delete
         </Button>
-        <Button
-          display="block"
-          width="100%"
-          size="sm"
-          textAlign="left"
-          variantColor="teal"
-          leftIcon="view-off"
-          onClick={() => {
-            setTaskPosition((t) => ({ ...t, visible: false }));
-            setSelectedTask(null);
-          }}
-        >
-          Hide
-        </Button>
+        {taskPositionValue.visible && (
+          <Button
+            display="block"
+            width="100%"
+            size="sm"
+            textAlign="left"
+            variantColor="teal"
+            leftIcon="view-off"
+            onClick={() => {
+              setTaskPosition((t) => ({ ...t, visible: false }));
+            }}
+          >
+            Hide
+          </Button>
+        )}
       </Grid>
       {dependencies.length > 0 && (
         <>
@@ -167,16 +170,29 @@ const SelectedTask: React.FC = () => {
           </Grid>
         </>
       )}
+      {flows.length > 0 && (
+        <>
+          <Heading size="lg" mt={3}>
+            Flows
+          </Heading>
+          <Grid gap={2}>
+            {flows.map((t) => (
+              <SidebarFlow key={t.id} taskId={task.id} flow={t} />
+            ))}
+          </Grid>
+        </>
+      )}
     </div>
   );
 };
 
 export default SelectedTask;
 
-export const SidebarDep: React.FC<{ taskId: string; onClick?: () => void }> = ({
-  taskId,
-  onClick,
-}) => {
+export const SidebarDep: React.FC<{
+  taskId: string;
+  onClick?: () => void;
+  noDelete?: boolean;
+}> = ({ taskId, onClick, noDelete }) => {
   const [selectedTaskValue, setSelected] = useRecoilState(selectedTask);
   const setDependencies = useSetRecoilState(dependencyList);
   const task = useRecoilValue(taskFamily(taskId));
@@ -201,24 +217,70 @@ export const SidebarDep: React.FC<{ taskId: string; onClick?: () => void }> = ({
       }}
     >
       <Box flex={1}>{task.title}</Box>
+      {!noDelete && (
+        <IconButton
+          aria-label="Remove Connection"
+          size="xs"
+          icon="delete"
+          variant="ghost"
+          variantColor="red"
+          onClick={(e) => {
+            e.stopPropagation();
+            setDependencies((d) =>
+              d.filter(({ left, right }) => {
+                if (
+                  (left === task.id && right === selectedTaskValue) ||
+                  (right === task.id && left === selectedTaskValue)
+                )
+                  return false;
+                return true;
+              })
+            );
+          }}
+        />
+      )}
+    </PseudoBox>
+  );
+};
+
+export const SidebarFlow: React.FC<{
+  taskId: string;
+  flow: FlowI;
+  onClick?: () => void;
+}> = ({ taskId, flow, onClick }) => {
+  const [selectedFlowValue, setSelected] = useRecoilState(selectedFlow);
+  const setTaskPosition = useSetRecoilState(
+    taskPositionFamily({ task: taskId, flow: flow.id })
+  );
+  return (
+    <PseudoBox
+      p={1}
+      pl={2}
+      pr={2}
+      display="flex"
+      borderColor="blue.300"
+      bg={flow.id === selectedFlowValue ? "blue.500" : "blue.800"}
+      borderWidth={1}
+      cursor="pointer"
+      _hover={{ bg: "blue.600" }}
+      _active={{ bg: "blue.400" }}
+      onClick={() => {
+        if (onClick) {
+          onClick();
+        }
+        setSelected(flow.id);
+      }}
+    >
+      <Box flex={1}>{flow.title}</Box>
       <IconButton
-        aria-label="Remove Connection"
+        aria-label="Remove from Flow"
         size="xs"
-        icon="delete"
+        icon="view-off"
         variant="ghost"
         variantColor="red"
         onClick={(e) => {
           e.stopPropagation();
-          setDependencies((d) =>
-            d.filter(({ left, right }) => {
-              if (
-                (left === task.id && right === selectedTaskValue) ||
-                (right === task.id && left === selectedTaskValue)
-              )
-                return false;
-              return true;
-            })
-          );
+          setTaskPosition((t) => ({ ...t, hidden: true }));
         }}
       />
     </PseudoBox>
