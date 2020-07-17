@@ -1,4 +1,4 @@
-import { atomFamily, selector } from "recoil";
+import { atom, RecoilState, selector } from "recoil";
 import { flowList } from "./flow";
 import { taskList } from "./task";
 
@@ -9,19 +9,38 @@ interface TaskPositionI {
   y: number;
   visible: boolean;
 }
-export const taskPositionFamily = atomFamily<
-  TaskPositionI,
-  { task: string; flow: string }
->({
-  key: "TaskPositionFamily",
-  default: ({ task, flow }) => ({
-    task,
-    flow,
-    x: 0,
-    y: 0,
-    visible: false,
-  }),
-});
+const taskPositionCache: Record<
+  string,
+  RecoilState<{
+    task: string;
+    flow: string;
+    x: number;
+    y: number;
+    visible: boolean;
+  }>
+> = {};
+
+export const taskPositionFamily = ({
+  task,
+  flow,
+}: {
+  task: string;
+  flow: string;
+}) => {
+  if (!taskPositionCache[`${task}-${flow}`]) {
+    taskPositionCache[`${task}-${flow}`] = atom({
+      key: `TaskFamily${`${task}-${flow}`}`,
+      default: {
+        task,
+        flow,
+        x: 0,
+        y: 0,
+        visible: false,
+      },
+    });
+  }
+  return taskPositionCache[`${task}-${flow}`];
+};
 
 export const unassignedTasks = selector<string[]>({
   key: "UnassignedTasks",

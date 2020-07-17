@@ -1,4 +1,4 @@
-import { atomFamily, atom, selectorFamily } from "recoil";
+import { atom, RecoilState, selectorFamily } from "recoil";
 import uniqid from "uniqid";
 
 const defaultFlow = uniqid();
@@ -6,10 +6,18 @@ export interface FlowI {
   id: string;
   title: string;
 }
-export const flowFamily = atomFamily<FlowI, string>({
-  key: "FlowFamily",
-  default: (id) => ({ id, title: "New Flow" }),
-});
+const flowFamilyCache: Record<string, RecoilState<FlowI>> = {};
+
+export const flowFamily = (id: string) => {
+  if (!flowFamilyCache[id]) {
+    flowFamilyCache[id] = atom({
+      key: `FlowFamily${id}`,
+      default: { id, title: "New Flow" },
+    });
+  }
+  return flowFamilyCache[id];
+};
+
 export const flowList = atom<string[]>({
   key: "FlowList",
   default: [defaultFlow],

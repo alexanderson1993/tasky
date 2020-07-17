@@ -1,4 +1,4 @@
-import { atomFamily, atom, selector } from "recoil";
+import { atom, RecoilState, selector } from "recoil";
 import { dependencyList, taskDependencies } from "./dependencies";
 export type TaskStatus = "none" | "completed" | "in-progress";
 export interface TaskI {
@@ -7,10 +7,17 @@ export interface TaskI {
   description: string;
   status: TaskStatus;
 }
-export const taskFamily = atomFamily<TaskI, string>({
-  key: "TaskFamily",
-  default: (id) => ({ id, title: "New Task", description: "", status: "none" }),
-});
+const taskFamilyCache: Record<string, RecoilState<TaskI>> = {};
+export const taskFamily = (id: string) => {
+  if (!taskFamilyCache[id]) {
+    taskFamilyCache[id] = atom({
+      key: `TaskFamily${id}`,
+      default: { id, title: "New Task", description: "", status: "none" },
+    });
+  }
+  return taskFamilyCache[id];
+};
+
 export const taskList = atom<string[]>({
   key: "TaskList",
   default: [],
