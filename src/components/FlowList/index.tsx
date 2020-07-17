@@ -66,7 +66,7 @@ const FlowList: React.FC = () => {
                 <FlowItem key={f} value={f} index={i} />
               ))}
               {provided.placeholder}
-              <FlowItem value={"Unassigned"} index={Infinity} />
+              <FlowItem value={"Unassigned"} index={999999999} />
             </List>
           )}
         </Droppable>

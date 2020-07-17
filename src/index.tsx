@@ -48,6 +48,7 @@ ReactDOM.render(
 );
 
 // TODO: Add training - reactour or something
+// TODO: Add global search
 // TODO: Mobile support
 // TODO: Add ability to add tasks from the sidebar, both independently and as dependencies/dependents
 // TODO: Link it to Firebase?

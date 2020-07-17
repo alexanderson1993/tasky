@@ -48,7 +48,7 @@ const FlowItem: React.FC<{ value: string; index: number }> = ({
           <Flex>
             <span
               {...provided.dragHandleProps}
-              style={{ visibility: isUnassigned ? "hidden" : "" }}
+              style={{ visibility: isUnassigned ? "hidden" : "visible" }}
             >
               <Icon
                 name="drag-handle"

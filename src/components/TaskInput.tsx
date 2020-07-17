@@ -118,9 +118,9 @@ const TaskInput: React.FC<{
     onInputValueChange: ({ inputValue }) => {
       inputValueRef.current = inputValue;
       setInputItems(
-        [createItem].concat(
-          matchSorter(taskValues, inputValue, { keys: ["title"] })
-        )
+        [createItem]
+          .concat(matchSorter(taskValues, inputValue, { keys: ["title"] }))
+          .slice(0, 6)
       );
     },
     onStateChange: (changes) => {
