@@ -36,7 +36,6 @@ const RightNode: React.FC<{
     onDragEnd: (state) => handleLineDrop(state),
   });
   const eventHandlers = bind() as any;
-  console.log(isDragging);
   return (
     <PseudoBox
       width="24px"
