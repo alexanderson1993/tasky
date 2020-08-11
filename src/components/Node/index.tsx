@@ -12,6 +12,7 @@ import { taskInputAtom } from "../../atoms/taskInput";
 
 const Node: React.FC<{
   id: string;
+  isDragging: boolean;
   panState: React.MutableRefObject<PanStateI>;
   handleLineDragStart: () => void;
   handleLineDrag: (
@@ -23,6 +24,7 @@ const Node: React.FC<{
   handleLineDrop: (state: FullGestureState<"drag">) => void;
 }> = ({
   id,
+  isDragging,
   panState,
   handleLineDragStart,
   handleLineDrag,
@@ -96,6 +98,7 @@ const Node: React.FC<{
       </PseudoBox>
       <RightNode
         nodeId={id}
+        isDragging={isDragging}
         isSelected={nodeInfo.isSelected}
         handleLineDragStart={handleLineDragStart}
         handleLineDrag={handleLineDrag}
@@ -103,6 +106,7 @@ const Node: React.FC<{
       />
       <LeftNode
         nodeId={id}
+        isDragging={isDragging}
         isSelected={nodeInfo.isSelected}
         handleLineDragStart={handleLineDragStart}
         handleLineDrag={handleLineDrag}

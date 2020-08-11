@@ -92,7 +92,9 @@ const TaskInput: React.FC<{
   canvasPosition: { x: number; y: number };
   close: () => void;
 }> = ({ x, y, lineDrag, canvasPosition, close }) => {
-  const taskValues = useRecoilValue(taskValueList);
+  const taskValues = useRecoilValue(taskValueList).filter(
+    (t) => t.status !== "completed"
+  );
   const [inputItems, setInputItems] = React.useState<TaskI[]>([]);
   const inputValueRef = React.useRef<string>("");
   const inputIndexRef = React.useRef<number>(-1);

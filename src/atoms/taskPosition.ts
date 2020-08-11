@@ -1,6 +1,6 @@
 import { atom, RecoilState, selector } from "recoil";
 import { flowList } from "./flow";
-import { taskList } from "./task";
+import { taskFamily, taskList } from "./task";
 
 interface TaskPositionI {
   task: string;
@@ -49,7 +49,10 @@ export const unassignedTasks = selector<string[]>({
     const flows = get(flowList);
     const filteredTasks = tasks.filter((t) => {
       if (
-        flows.find((f) => get(taskPositionFamily({ task: t, flow: f })).visible)
+        flows.find(
+          (f) => get(taskPositionFamily({ task: t, flow: f })).visible
+        ) ||
+        get(taskFamily(t)).status === "completed"
       )
         return false;
       return true;

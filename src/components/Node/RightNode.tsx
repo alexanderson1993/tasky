@@ -8,6 +8,7 @@ import { extraDependentsShown } from "../../atoms/node";
 
 const RightNode: React.FC<{
   nodeId: string;
+  isDragging: boolean;
   isSelected: boolean;
   handleLineDragStart: () => void;
   handleLineDrag: (
@@ -19,6 +20,7 @@ const RightNode: React.FC<{
   handleLineDrop: (state: FullGestureState<"drag">) => void;
 }> = ({
   nodeId,
+  isDragging,
   isSelected,
   handleLineDragStart,
   handleLineDrag,
@@ -34,6 +36,7 @@ const RightNode: React.FC<{
     onDragEnd: (state) => handleLineDrop(state),
   });
   const eventHandlers = bind() as any;
+  console.log(isDragging);
   return (
     <PseudoBox
       width="24px"
@@ -60,6 +63,7 @@ const RightNode: React.FC<{
     >
       {deps.length > 0 && (
         <Box
+          pointerEvents={isDragging ? "none" : "all"}
           borderRadius="5px"
           bg="blue.800"
           position="absolute"

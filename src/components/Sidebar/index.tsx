@@ -6,6 +6,7 @@ import { selectedTask, taskGoals, taskUnblocked } from "../../atoms/task";
 import SelectedTask, { SidebarDep } from "./SelectedTask";
 import ProjectDetails from "./ProjectDetails";
 import { selectedFlow } from "../../atoms/flow";
+import Search from "./Search";
 
 export const TaskList: React.FC<{
   title?: string;
@@ -37,32 +38,35 @@ const Sidebar: React.FC = () => {
       justifyContent="space-between"
       alignItems="stretch"
       height="100vh"
-      overflowY="auto"
       color="white"
       bg="gray.800"
       borderRightColor="gray.600"
       borderRightWidth={2}
       p={2}
     >
-      {taskPage === "project" ? (
-        <ProjectDetails setTaskPage={setTaskPage} />
-      ) : taskPage === "goals" ? (
-        <TaskList
-          title="Goals"
-          taskAtom={taskGoals}
-          onClick={() => setTaskPage(null)}
-        />
-      ) : taskPage === "unblocked" ? (
-        <TaskList
-          title="Unblocked"
-          taskAtom={taskUnblocked}
-          onClick={() => setTaskPage(null)}
-        />
-      ) : selected ? (
-        <SelectedTask />
-      ) : (
-        <FlowList />
-      )}
+      <Search />
+      <Box flex={1} overflowY={"auto"}>
+        {taskPage === "project" ? (
+          <ProjectDetails setTaskPage={setTaskPage} />
+        ) : taskPage === "goals" ? (
+          <TaskList
+            title="Goals"
+            taskAtom={taskGoals}
+            onClick={() => setTaskPage(null)}
+          />
+        ) : taskPage === "unblocked" ? (
+          <TaskList
+            title="Unblocked"
+            taskAtom={taskUnblocked}
+            onClick={() => setTaskPage(null)}
+          />
+        ) : selected ? (
+          <SelectedTask />
+        ) : (
+          <FlowList />
+        )}
+      </Box>
+
       <Stack mt={2}>
         <Button
           size="sm"

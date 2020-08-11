@@ -47,12 +47,8 @@ ReactDOM.render(
   rootElement
 );
 
-// TODO: Don't show completed tasks in the unassigned list
-// TODO: Don't show completed tasks in the task add search box
 // TODO: Add training - reactour or something
-// TODO: Add global search
 // TODO: Mobile support
 // TODO: Hotkeys
-// TODO: Fix janky Left- and Right-node button overlay issues
 // TODO: Add ability to add tasks from the sidebar, both independently and as dependencies/dependents
 // TODO: Link it to Firebase?

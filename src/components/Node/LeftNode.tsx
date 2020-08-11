@@ -8,6 +8,7 @@ import { extraDependenciesShown } from "../../atoms/node";
 
 const LeftNode: React.FC<{
   nodeId: string;
+  isDragging: boolean;
   isSelected: boolean;
   handleLineDragStart: () => void;
   handleLineDrag: (
@@ -19,6 +20,7 @@ const LeftNode: React.FC<{
   handleLineDrop: (state: FullGestureState<"drag">) => void;
 }> = ({
   nodeId,
+  isDragging,
   isSelected,
   handleLineDragStart,
   handleLineDrag,
@@ -65,6 +67,7 @@ const LeftNode: React.FC<{
           position="absolute"
           width={`${deps.length.toString().length + 2}ch`}
           right="0"
+          pointerEvents={isDragging ? "none" : "all"}
           onMouseDown={(e) => e.stopPropagation()}
           onMouseMove={(e) => e.stopPropagation()}
           onMouseUp={(e) => {

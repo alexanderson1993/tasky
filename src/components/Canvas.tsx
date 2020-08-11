@@ -326,6 +326,7 @@ const Canvas: React.FC = () => {
                 key={n}
                 id={n}
                 panState={panState}
+                isDragging={!!lineDrag}
                 handleLineDragStart={handleLineDragStart}
                 handleLineDrag={handleLineDrag}
                 handleLineDrop={handleLineDrop}
