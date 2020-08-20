@@ -1,5 +1,9 @@
 import { atom, RecoilState, selector } from "recoil";
-import { dependencyList, taskDependencies } from "./dependencies";
+import {
+  dependencyList,
+  taskDependencies,
+  taskDependents,
+} from "./dependencies";
 export type TaskStatus = "none" | "completed" | "in-progress";
 export interface TaskI {
   id: string;
@@ -72,12 +76,15 @@ export const taskUnblocked = selector<string[]>({
       const task = get(taskFamily(t));
       if (task.status === "completed") return false;
       const dependencies = get(taskDependencies(t));
-      // If the task has no dependencies, or all dependencies are
-      // completed, then it is unblocked.
+      const dependents = get(taskDependents(t));
+      // If the task has no dependencies AND has dependents, OR it has one or more dependencies AND
+      // all dependencies are completed, then it is unblocked.
+      if (dependencies.length === 0 && dependents.length > 0) return true;
       const filteredDependencies = dependencies
         .map((id) => get(taskFamily(id)))
         .filter((d) => d.status !== "completed");
-      if (filteredDependencies.length === 0) return true;
+      if (dependencies.length > 0 && filteredDependencies.length === 0)
+        return true;
       return false;
     });
   },
