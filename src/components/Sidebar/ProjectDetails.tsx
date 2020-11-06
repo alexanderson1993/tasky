@@ -1,16 +1,21 @@
 import { Button, Heading, Stack, useToast } from "@chakra-ui/core";
 import React, { ChangeEvent, Dispatch } from "react";
-import { useRecoilCallback, useRecoilState } from "recoil";
-import { projectName } from "../../atoms/project";
+import { useRecoilCallback, useRecoilState, useRecoilValue } from "recoil";
+import { projectId, projectName, projectSync } from "../../atoms/project";
+import { firebase, ui } from "../../firebase/init";
 import { generateData, setData } from "../../hooks/usePersistedStorage";
 import { useConfirm, usePrompt } from "../Dialog";
+import { useAuthState } from "react-firebase-hooks/auth";
+import uniqid from "uniqid";
 
 const ProjectDetails: React.FC<{
   setTaskPage: Dispatch<
     React.SetStateAction<null | "goals" | "unblocked" | "project">
   >;
 }> = ({ setTaskPage }) => {
+  const [projectIdValue, setProjectId] = useRecoilState(projectId);
   const [projectNameValue, setProjectName] = useRecoilState(projectName);
+  const [projectSyncValue, setProjectSync] = useRecoilState(projectSync);
   const prompt = usePrompt();
   const confirm = useConfirm();
   const toast = useToast();
@@ -71,8 +76,49 @@ const ProjectDetails: React.FC<{
     setTaskPage(null);
     localStorage.removeItem("tasky_storage");
   });
+  const loginRef = React.useRef<HTMLDivElement>();
+  const [user]: [
+    ReturnType<typeof firebase.auth>["currentUser"],
+    boolean,
+    any
+  ] = useAuthState(firebase.auth());
+
   return (
     <div>
+      {user ? (
+        <Button
+          variantColor="blue"
+          size="sm"
+          onClick={() => firebase.auth().signOut()}
+          width="100%"
+        >
+          Logout
+        </Button>
+      ) : (
+        <Button
+          variantColor="blue"
+          size="sm"
+          onClick={() =>
+            ui.start(loginRef.current, {
+              callbacks: {
+                signInSuccessWithAuthResult: function () {
+                  return false;
+                },
+              },
+              signInOptions: [
+                firebase.auth.EmailAuthProvider.PROVIDER_ID,
+                firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+                firebase.auth.GithubAuthProvider.PROVIDER_ID,
+              ],
+              signInFlow: "popup",
+            })
+          }
+          width="100%"
+        >
+          Login
+        </Button>
+      )}
+      <div ref={loginRef} />
       <Heading size="lg">Project</Heading>
       <Heading size="md">{projectNameValue || "New Project"}</Heading>
       <Stack mt={2}>
@@ -120,6 +166,45 @@ const ProjectDetails: React.FC<{
             Import
           </Button>
         </label>
+        {user &&
+          (projectSyncValue ? (
+            <Button
+              size="sm"
+              width="100%"
+              justifyContent="start"
+              variantColor="yellow"
+              leftIcon="repeat"
+              isDisabled
+            >
+              Project Sync Enabled
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              width="100%"
+              justifyContent="start"
+              variantColor="yellow"
+              leftIcon="repeat"
+              onClick={async () => {
+                const id = projectIdValue || uniqid();
+                if (!projectIdValue) {
+                  setProjectId(id);
+                }
+                await firebase.firestore().collection("projects").doc(id).set(
+                  {
+                    projectId: id,
+                    projectName: projectNameValue,
+                    projectSync: true,
+                    userId: user.uid,
+                  },
+                  { merge: true }
+                );
+                setProjectSync(true);
+              }}
+            >
+              Enable Project Sync
+            </Button>
+          ))}
         <Button
           size="sm"
           width="100%"

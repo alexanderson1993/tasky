@@ -3,3 +3,42 @@
   height: 100vh;
   width: 100vw;
 }
+.firebaseui-idp-button {
+  border-radius: 0.25rem;
+  font-weight: 600;
+  width: 100%;
+  display: inline-flex;
+  appearance: none;
+  align-items: center;
+  justify-content: start;
+  transition: all 250ms;
+  user-select: none;
+  position: relative;
+  white-space: nowrap;
+  vertical-align: middle;
+  line-height: 1.2;
+  outline: none;
+  height: 2rem;
+  min-width: 2rem;
+  font-size: 0.875rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  background-color: #3182ce;
+  color: #fff;
+  margin-bottom: 0.5rem;
+}
+.firebaseui-idp-text-short {
+  display: none;
+}
+.firebaseui-idp-icon-wrapper {
+  height: 100%;
+}
+.firebaseui-idp-icon-wrapper img {
+  height: 100%;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  margin-right: 1rem;
+}
+.firebaseui-idp-google {
+  color: #111;
+}

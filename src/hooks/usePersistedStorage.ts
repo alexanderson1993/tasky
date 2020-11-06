@@ -4,8 +4,9 @@ import { taskPositionFamily } from "../atoms/taskPosition";
 import { flowFamily, flowList, selectedFlow } from "../atoms/flow";
 import debounce from "lodash.debounce";
 import { dependencyList } from "../atoms/dependencies";
-import { projectName } from "../atoms/project";
-
+import { projectId, projectName, projectSync } from "../atoms/project";
+import { firebase } from "../firebase/init";
+import uniqid from "uniqid";
 export const generateData = async function (snapshot) {
   const taskIds = await snapshot.getPromise(taskList);
 
@@ -35,10 +36,14 @@ export const generateData = async function (snapshot) {
     tasks.push(await snapshot.getPromise(taskFamily(id)));
   }
   // Project name
+  const projectIdValue = await snapshot.getPromise(projectId);
   const projectNameValue = await snapshot.getPromise(projectName);
+  const projectSyncValue = await snapshot.getPromise(projectSync);
 
   return {
+    projectId: projectIdValue,
     projectName: projectNameValue,
+    projectSync: projectSyncValue,
     tasks,
     flows,
     dependencies,
@@ -46,8 +51,16 @@ export const generateData = async function (snapshot) {
   };
 };
 const processSnapshot = debounce(async function (snapshot) {
+  const projectSyncValue = await snapshot.getPromise(projectSync);
+  const userId = firebase.auth().currentUser.uid;
   const data = await generateData(snapshot);
-
+  if (projectSyncValue) {
+    await firebase
+      .firestore()
+      .collection("projects")
+      .doc(data.projectId)
+      .set({ userId, ...data }, { merge: true });
+  }
   localStorage.setItem("tasky_storage", JSON.stringify(data));
 }, 1000);
 
@@ -59,13 +72,17 @@ export function usePersistStorage() {
 
 export function setData(data, set) {
   const {
+    projectId: projectIdValue,
     projectName: projectNameValue,
+    projectSync: projectSyncValue,
     tasks,
     flows,
     dependencies,
     selectedFlow: selectedFlowValue,
   } = data;
+  set(projectId, projectIdValue || uniqid());
   set(projectName, projectNameValue);
+  set(projectSync, projectSyncValue || false);
   set(selectedFlow, selectedFlowValue || flows?.[0]?.id || null);
 
   tasks.forEach((t) => {

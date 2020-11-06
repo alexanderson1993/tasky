@@ -9,7 +9,8 @@ import App from "./App";
 import Dialog from "./components/Dialog";
 import { initState } from "./hooks/usePersistedStorage";
 import { css, Global } from "@emotion/core";
-
+import "./firebase/init";
+import "./styles.css";
 const customTheme = {
   ...theme,
   colors: {
