@@ -2,7 +2,7 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
 
-import firebaseui from "firebaseui";
+import * as firebaseui from "firebaseui";
 const firebaseConfig = {
   apiKey: "AIzaSyCfyiGWIBBJQMD_AHH-6t8JGedpOlSuLL8",
   authDomain: "tasky-294722.firebaseapp.com",
